@@ -60,10 +60,27 @@ void	PmergeMe::printVec(const std::vector<int> &v, bool isSorted) {
 	std::cout << std::endl;
 }
 
+void	PmergeMe::printVec(const std::vector<std::vector<int>::iterator> &v, bool isSorted) {
+	switch(isSorted) {
+		case SORTED:
+			std::cout << "After:	";
+			break;
+		default:
+			std::cout << "Before:	";
+			break;
+	}
+	for (std::vector<std::vector<int>::iterator>::const_iterator it = v.begin(); it != v.end(); ++it) {
+		std::cout << **it << " ";
+	}
+	std::cout << std::endl;
+}
+
 void	PmergeMe::sortVec(std::vector<int> &container, int pair_lvl) {
 	typedef std::vector<int>::iterator Iterator;
 	
 	int pair_units = container.size() / pair_lvl;
+	if (pair_units < 2)
+		return;
 
 	bool is_odd = pair_units % 2 == 1;
 	
@@ -89,9 +106,46 @@ void	PmergeMe::sortVec(std::vector<int> &container, int pair_lvl) {
 	std::vector<Iterator> main;
 	std::vector<Iterator> pend;
 
-	main.insert(begin, pair_lvl - 1);
-	main.insert(begin, pair_lvl * 2 - 1);
+	main.insert(main.begin(), _next(begin, pair_lvl - 1));
+	main.insert(main.end(), _next(begin, pair_lvl * 2 - 1));
 
-	
+	for (int i = 4; i <= pair_units; i+=2) {
+		pend.insert(pend.end(), _next(begin, pair_lvl * (i - 1) - 1));
+		main.insert(main.end(), _next(begin, pair_lvl * i - 1));
+	}
+	if (is_odd) {
+		pend.insert(pend.end(), _next(end, pair_lvl - 1));
+	}
+	std::cout << "before";
+	printVec(pend, false);
+	printVec(main, true);
+
+	int prevJacobsthal = _JacobsthalNum(1);
+	int InsertedCount = 0;
+	for (int k = 2;; ++k) {
+		int currJacobsthal = _JacobsthalNum(k);
+		int JacobsthalDiff = currJacobsthal - prevJacobsthal;
+		if (static_cast<int>(pend.size()) < JacobsthalDiff)
+			break;
+		int offset = 0;
+		int bound = InsertedCount + currJacobsthal;
+		for (int timesToInsert = JacobsthalDiff; timesToInsert; --timesToInsert) {
+			int pendPos = timesToInsert - 1;
+			typename std::vector<Iterator>::iterator InsertPos = 
+				std::upper_bound(main.begin(), _next(main.begin(), bound), pend.at(pendPos), _comp<Iterator>);
+			
+			std::vector<Iterator>::iterator inserted = main.insert(InsertPos, pend.at(pendPos));
+			pend.erase(_next(pend.begin(), pendPos));
+
+			offset += inserted == _next(main.begin(), InsertedCount + currJacobsthal);
+			bound = InsertedCount + currJacobsthal - offset;
+		}
+		prevJacobsthal = currJacobsthal;
+		InsertedCount += JacobsthalDiff;
+	}
+	std::cout << "after:";
+	printVec(pend, false);
+	printVec(main, true);
+	std::cout << _compCount << std::endl;
 }
 

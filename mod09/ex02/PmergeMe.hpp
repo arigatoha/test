@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <cmath>
 
 #define SORTED 1
 #define UNSORTED 0
@@ -30,6 +31,8 @@ class PmergeMe {
             }
         }
 
+        int     _JacobsthalNum(int n) { return (pow(2, n + 1) + pow(-1, n)) / 3; }
+
     public:
 
         static int _compCount;
@@ -43,6 +46,8 @@ class PmergeMe {
         PmergeMe &operator=(const PmergeMe &other);
         
         void	printVec(const std::vector<int> &vec, bool isSorted);
+
+        void	printVec(const std::vector<std::vector<int>::iterator> &v, bool isSorted);
 
         void	sortVec(std::vector<int> &vec, int pair_lvl);
 
