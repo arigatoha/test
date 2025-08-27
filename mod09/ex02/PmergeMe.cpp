@@ -94,9 +94,6 @@ void	PmergeMe::sortVec(std::vector<int> &container, int pair_lvl) {
 		Iterator this_pair = _next(it, pair_lvl - 1);
 		Iterator next_pair = _next(it, pair_lvl * 2 - 1);
 	
-		// std::cout << "this pair:" << *this_pair << '\n';
-		// std::cout << "next pair:" << *next_pair << '\n';
-
 		if (!_comp(this_pair, next_pair)) {
 			_swap_pair(this_pair, pair_lvl);		
 		}
@@ -106,19 +103,16 @@ void	PmergeMe::sortVec(std::vector<int> &container, int pair_lvl) {
 	std::vector<Iterator> main;
 	std::vector<Iterator> pend;
 
-	main.insert(main.begin(), _next(begin, pair_lvl - 1));
-	main.insert(main.end(), _next(begin, pair_lvl * 2 - 1));
+	main.insert(main.end(), _next(container.begin(), pair_lvl - 1));
+	main.insert(main.end(), _next(container.begin(), pair_lvl * 2 - 1));
 
 	for (int i = 4; i <= pair_units; i+=2) {
-		pend.insert(pend.end(), _next(begin, pair_lvl * (i - 1) - 1));
-		main.insert(main.end(), _next(begin, pair_lvl * i - 1));
+		pend.insert(pend.end(), _next(container.begin(), pair_lvl * (i - 1) - 1));
+		main.insert(main.end(), _next(container.begin(), pair_lvl * i - 1));
 	}
 	if (is_odd) {
 		pend.insert(pend.end(), _next(end, pair_lvl - 1));
 	}
-	std::cout << "before";
-	printVec(pend, false);
-	printVec(main, true);
 
 	int prevJacobsthal = _JacobsthalNum(1);
 	int InsertedCount = 0;
@@ -133,7 +127,7 @@ void	PmergeMe::sortVec(std::vector<int> &container, int pair_lvl) {
 			int pendPos = timesToInsert - 1;
 			typename std::vector<Iterator>::iterator InsertPos = 
 				std::upper_bound(main.begin(), _next(main.begin(), bound), pend.at(pendPos), _comp<Iterator>);
-			
+
 			std::vector<Iterator>::iterator inserted = main.insert(InsertPos, pend.at(pendPos));
 			pend.erase(_next(pend.begin(), pendPos));
 
@@ -143,9 +137,29 @@ void	PmergeMe::sortVec(std::vector<int> &container, int pair_lvl) {
 		prevJacobsthal = currJacobsthal;
 		InsertedCount += JacobsthalDiff;
 	}
-	std::cout << "after:";
-	printVec(pend, false);
-	printVec(main, true);
-	std::cout << _compCount << std::endl;
+
+	for (int i = pend.size() - 1; i >= 0; --i) {
+		int bound = main.size() - pend.size() + i + is_odd;
+		typename std::vector<Iterator>::iterator InsertPos = 
+			std::upper_bound(main.begin(), _next(main.begin(), bound), pend.at(i), _comp<Iterator>);
+		
+		main.insert(InsertPos, pend.at(i));
+		pend.pop_back();
+	}
+
+	std::vector<int> copy;
+	copy.reserve(container.size());
+	for (std::vector<Iterator>::iterator it = main.begin(); it != main.end(); ++it) {
+
+		for (int i = 0; i < pair_lvl; ++i) {
+			std::vector<int>::iterator copy_it = *it;
+
+			std::advance(copy_it, -pair_lvl + i + 1);
+			copy.insert(copy.end(), *copy_it);
+		}
+	}
+
+	container.swap(copy);
+
 }
 

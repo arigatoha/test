@@ -11,16 +11,9 @@
 class PmergeMe {
     private:
 
-        template <typename T> static  bool    _comp(const T &a, const T &b) {
-            ++_compCount;
-            return *a < *b;
-        }
 
-        template <typename T> static  T    _next(T it, int steps) {
-            std::advance(it, steps);
 
-            return it;
-        }
+
 
         template <typename T> static  void    _swap_pair(T &it, int pair_lvl) {
             T   start = _next(it, -(pair_lvl - 1));
@@ -34,6 +27,17 @@ class PmergeMe {
         int     _JacobsthalNum(int n) { return (pow(2, n + 1) + pow(-1, n)) / 3; }
 
     public:
+
+        template <typename T> static  bool    _comp(const T &a, const T &b) {
+            ++_compCount;
+            return *a < *b;
+        }
+
+        template <typename T> static  T    _next(T it, int steps) {
+            std::advance(it, steps);
+
+            return it;
+        }
 
         static int _compCount;
 
