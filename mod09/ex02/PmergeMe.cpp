@@ -41,7 +41,6 @@ std::vector<int>    PmergeMe::parseInput(int numbers_count, char **numbers) {
             throw std::logic_error("couldn't parse the input.");
         unsortedVec.push_back(static_cast<int>(num));
 	}
-	printVec(unsortedVec, UNSORTED);
 	return unsortedVec;
 }
 
@@ -144,7 +143,6 @@ void	PmergeMe::sortVec(std::vector<int> &container, int pair_lvl) {
 			std::upper_bound(main.begin(), _next(main.begin(), bound), pend.at(i), _comp<Iterator>);
 		
 		main.insert(InsertPos, pend.at(i));
-		pend.pop_back();
 	}
 
 	std::vector<int> copy;
@@ -163,3 +161,17 @@ void	PmergeMe::sortVec(std::vector<int> &container, int pair_lvl) {
 
 }
 
+void	PmergeMe::sortInput(std::vector<int> &v) {
+	PmergeMe::printVec(v, UNSORTED);
+	
+	PmergeMe::sortVec(v, 1);
+
+	int average_comps = _averageComplextity(static_cast<int>(v.size()));
+	if (this->_compCount > average_comps)
+		std::cout << "failed\n";
+
+	PmergeMe::printVec(v, SORTED);
+
+	std::cout << this->_compCount << " Comparisons" << std::endl;
+    std::cout << average_comps << " Average Comparisons" << std::endl;
+}
